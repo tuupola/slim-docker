@@ -1,15 +1,15 @@
+version: "3"
 services:
   apache:
-    build:
-      context: ./docker/apache
+    image: slim-docker-apache
     volumes:
       - ./:/srv/www
     ports:
       - "80:80"
-      - "443:443"
+    deploy:
+      replicas: 3
   mariadb:
-    build:
-      context: ./docker/mariadb
+    image: mariadb:latest
     environment:
       - MYSQL_DATABASE=example
       - MYSQL_USER=user
