@@ -1,4 +1,4 @@
-# Slim + Apache + MariaDB in Docker Swarm
+# Slim + Apache + MariaDB as Docker Stack
 
 Three instances of PHP 8.1 as an Apache module load balanced by the swarm. Single MariaDB instance also in the swarm. This requires you to install Composer dependencies locally in the host machine.
 
