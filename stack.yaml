@@ -1,13 +1,38 @@
 version: "3"
 services:
+  traefik:
+    image: traefik:2.9
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    command:
+      - --providers.docker
+      - --providers.docker.swarmmode
+      - --providers.docker.exposedbydefault=false
+      - --api.insecure=true
+      - --accesslog
+      - --log
+    # deploy:
+    #   labels:
+    #     - traefik.enable=true
+    #     - traefik.http.routers.traefik.rule=Host(`traefik.localhost`)
+    #     - traefik.http.routers.traefik.service=api@internal
+    #     - traefik.http.services.traefik.loadbalancer.server.port=80
   apache:
     image: slim-docker-apache
     volumes:
       - ./:/srv/www
-    ports:
-      - "80:80"
+    # ports:
+    #   - "80:80"
     deploy:
       replicas: 3
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.apache.rule=Host(`slim.localhost`)
+        - traefik.http.services.apache.loadbalancer.server.port=80
   mariadb:
     image: mariadb:latest
     environment:
