@@ -1,13 +1,29 @@
-version: "3"
+version: "3.9"
 services:
+  caddy:
+    image: slim-docker-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # Make sure Caddy uses the correct network for service discovery.
+      # https://github.com/lucaslorentz/caddy-docker-proxy/issues/207
+      - CADDY_INGRESS_NETWORKS=slim_default
   apache:
     image: slim-docker-apache
     volumes:
       - ./:/srv/www
-    ports:
-      - "80:80"
     deploy:
       replicas: 3
+      # Do not create Docker virtual IP endpoint since Caddy is used
+      # for load balancing.
+      endpoint_mode: dnsrr
+    labels:
+      caddy: apache.localhost
+      caddy.reverse_proxy: "{{upstreams 80}}"
   mariadb:
     image: mariadb:latest
     environment:
