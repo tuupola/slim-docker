@@ -43,7 +43,7 @@ $ docker service logs slim_apache -f
 Verify that the [basic route](https://github.com/tuupola/slim-docker/blob/apache-php/app.php#L43-L51) is working.
 
 ```
-$ curl --ipv4 --include slim.localhost
+$ curl --ipv4 --include apache.localhost
 HTTP/1.1 200 OK
 Content-Length: 12
 Content-Type: text/html; charset=UTF-8
@@ -53,7 +53,7 @@ X-Powered-By: PHP/8.1.13
 
 Hello world!
 
-$ curl --ipv4 --include slim.localhost/mars
+$ curl --ipv4 --include apache.localhost/mars
 HTTP/1.1 200 OK
 Content-Length: 11
 Content-Type: text/html; charset=UTF-8
@@ -67,7 +67,7 @@ Hello mars!
 Verify you can [query the database](https://github.com/tuupola/slim-docker/blob/apache-php/app.php#L26-L41) successfully.
 
 ```
-$ curl --ipv4 --include slim.localhost/cars
+$ curl --ipv4 --include apache.localhost/cars
 HTTP/1.1 200 OK
 Content-Length: 15
 Content-Type: text/html; charset=UTF-8
@@ -81,7 +81,7 @@ Tesla Audi BMW
 Verify that [static files](https://github.com/tuupola/slim-docker/blob/apache-php/public/static.html) are being served.
 
 ```
-$ curl --ipv4 --include slim.localhost/static.html
+$ curl --ipv4 --include apache.localhost/static.html
 HTTP/1.1 200 OK
 Date: Sat, 10 Dec 2022 13:37:50 GMT
 Server: Apache/2.4.54 (Debian)
@@ -97,7 +97,7 @@ static
 You can also [dump the `$_SERVER`](https://github.com/tuupola/slim-docker/blob/apache-php/app.php#L17-L24) superglobal for debugging purposes.
 
 ```
-$ curl --ipv4 --include "slim.localhost/server?foo=bar"
+$ curl --ipv4 --include "apache.localhost/server?foo=bar"
 HTTP/1.1 200 OK
 Content-Type: text/html; charset=UTF-8
 Date: Sun, 11 Dec 2022 16:55:54 GMT
@@ -108,21 +108,21 @@ Transfer-Encoding: chunked
 
 array (
   'REDIRECT_STATUS' => '200',
-  'HTTP_HOST' => 'slim.localhost',
+  'HTTP_HOST' => 'apache.localhost',
   'HTTP_USER_AGENT' => 'curl/7.82.0',
   'HTTP_ACCEPT' => '*/*',
   'HTTP_X_FORWARDED_FOR' => '10.0.0.2',
-  'HTTP_X_FORWARDED_HOST' => 'slim.localhost',
+  'HTTP_X_FORWARDED_HOST' => 'apache.localhost',
   'HTTP_X_FORWARDED_PORT' => '80',
   'HTTP_X_FORWARDED_PROTO' => 'http',
   'HTTP_X_FORWARDED_SERVER' => 'a70a47c6effa',
   'HTTP_X_REAL_IP' => '10.0.0.2',
   'HTTP_ACCEPT_ENCODING' => 'gzip',
   'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-  'SERVER_SIGNATURE' => '<address>Apache/2.4.54 (Debian) Server at slim.localhost Port 80</address>
+  'SERVER_SIGNATURE' => '<address>Apache/2.4.54 (Debian) Server at apache.localhost Port 80</address>
 ',
   'SERVER_SOFTWARE' => 'Apache/2.4.54 (Debian)',
-  'SERVER_NAME' => 'slim.localhost',
+  'SERVER_NAME' => 'apache.localhost',
   'SERVER_ADDR' => '10.0.3.8',
   'SERVER_PORT' => '80',
   'REMOTE_ADDR' => '10.0.3.14',
