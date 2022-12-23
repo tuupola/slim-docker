@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 services:
   traefik:
     image: traefik:2.9
@@ -34,6 +34,9 @@ services:
       - ./:/srv/www
     deploy:
       replicas: 3
+      # Do not create Docker virtual IP endpoint since Traefik is used
+      # for load balancing.
+      endpoint_mode: dnsrr
       labels:
         # Make Apache available via Traefik.
         - traefik.enable=true
