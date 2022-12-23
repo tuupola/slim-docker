@@ -1,6 +1,6 @@
-# Slim + Apache + MariaDB as Docker Stack
+# Slim + Apache + MariaDB as a Stack
 
-Three instances of PHP 8.1 as an Apache module load balanced by the swarm. Single MariaDB instance also in the swarm. This requires you to install Composer dependencies locally in the host machine.
+Three instances of PHP 8.1 as an Apache module load balanced by the [swarm routing mesh](https://docs.docker.com/engine/swarm/ingress/). Single MariaDB instance also in the swarm. Current directory mounted into webserver so code changes can be seen immediately.  This requires you to install Composer dependencies locally in the host machine.
 
 If first time testing you need to checkout the repo, change branch and build the `slim-docker-apache` image. If you have already tested the `apache-php` branch the image has already been built for you.
 
@@ -30,7 +30,7 @@ $ docker service logs slim_apache -f
 Verify that the [basic route](https://github.com/tuupola/slim-docker/blob/apache-php/app.php#L43-L51) is working.
 
 ```
-$ curl --include localhost
+$ curl --ipv4 --include localhost
 HTTP/1.1 200 OK
 Date: Sat, 10 Dec 2022 13:36:45 GMT
 Server: Apache/2.4.54 (Debian)
@@ -40,7 +40,7 @@ Content-Type: text/html; charset=UTF-8
 
 Hello world!
 
-$ curl --include localhost/mars
+$ curl --ipv4 --include localhost/mars
 HTTP/1.1 200 OK
 Date: Sat, 10 Dec 2022 13:37:10 GMT
 Server: Apache/2.4.54 (Debian)
@@ -54,7 +54,7 @@ Hello mars!
 Verify you can [query the database](https://github.com/tuupola/slim-docker/blob/apache-php/app.php#L26-L41) successfully.
 
 ```
-$ curl --include localhost/cars
+$ curl --ipv4 --include localhost/cars
 HTTP/1.1 200 OK
 Date: Sat, 10 Dec 2022 13:37:32 GMT
 Server: Apache/2.4.54 (Debian)
@@ -68,7 +68,7 @@ Tesla Audi BMW
 Verify that [static files](https://github.com/tuupola/slim-docker/blob/apache-php/public/static.html) are being served.
 
 ```
-$ curl --include localhost/static.html
+$ curl --ipv4 --include localhost/static.html
 HTTP/1.1 200 OK
 Date: Sat, 10 Dec 2022 13:37:50 GMT
 Server: Apache/2.4.54 (Debian)
@@ -84,7 +84,7 @@ static
 You can also [dump the `$_SERVER`](https://github.com/tuupola/slim-docker/blob/apache-php/app.php#L17-L24) superglobal for debugging purposes.
 
 ```
-$ curl --include "localhost/server?foo=bar"
+$ curl --ipv4 --include "localhost/server?foo=bar"
 HTTP/1.1 200 OK
 Date: Sat, 10 Dec 2022 13:38:16 GMT
 Server: Apache/2.4.54 (Debian)
