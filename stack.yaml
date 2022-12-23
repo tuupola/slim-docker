@@ -1,6 +1,8 @@
 version: "3.9"
 services:
   caddy:
+    # Locally built image. In production you would fetch this
+    # from a registry such as Docker Hub.
     image: slim-docker-caddy
     ports:
       - "80:80"
@@ -13,6 +15,8 @@ services:
       # https://github.com/lucaslorentz/caddy-docker-proxy/issues/207
       - CADDY_INGRESS_NETWORKS=slim_default
   apache:
+    # Locally built image. In production you would fetch this
+    # from a registry such as Docker Hub.
     image: slim-docker-apache
     volumes:
       - ./:/srv/www

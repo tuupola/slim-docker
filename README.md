@@ -1,6 +1,6 @@
-# Caddy + Slim + Apache + MariaDB as Docker Stack
+# Caddy + Slim + Apache + MariaDB as a Stack
 
-Three instances of PHP 8.1 as an Apache module load balanced by Caddy. Single MariaDB instance also in the swarm. This requires you to install Composer dependencies locally in the host machine.
+Three instances of PHP 8.1 as an Apache module load balanced by Caddy. Single MariaDB instance also in the swarm. Current directory mounted into webserver so code changes can be seen immediately. This requires you to install Composer dependencies locally in the host machine.
 
 If first time testing you need to checkout the repo, change branch and build the `slim-docker-apache` image. If you have already tested the `caddy-apache-php` branch the image has already been built for you.
 
@@ -22,7 +22,7 @@ $ docker stack ls
 $ docker service ls
 ```
 
-Youcan `tail -f` Apache logs to see the load balancing in action.
+You can `tail -f` Apache logs to see the load balancing in action.
 
 ```
 $ docker service logs slim_apache -f
