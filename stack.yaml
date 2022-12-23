@@ -11,15 +11,22 @@ services:
       - --providers.docker
       - --providers.docker.swarmmode
       - --providers.docker.exposedbydefault=false
+      - --entryPoints.open.address=:80
+      - --entryPoints.secure.address=:443
+      # Force http to https redirect
+      - --entrypoints.open.http.redirections.entryPoint.to=secure
+      - --entrypoints.open.http.redirections.entryPoint.scheme=https
       - --accesslog
       - --api
       - --log
       - --log.level=DEBUG
     deploy:
       labels:
+        # Make Traefik dashboard available via Traefik.
         - traefik.enable=true
         - traefik.http.routers.traefik.rule=Host(`traefik.localhost`)
         - traefik.http.routers.traefik.service=api@internal
+        - traefik.http.routers.traefik.tls=true
         - traefik.http.services.traefik.loadbalancer.server.port=8080
   apache:
     image: slim-docker-apache
@@ -28,8 +35,10 @@ services:
     deploy:
       replicas: 3
       labels:
+        # Make Apache available via Traefik.
         - traefik.enable=true
         - traefik.http.routers.apache.rule=Host(`apache.localhost`)
+        - traefik.http.routers.apache.tls=true
         - traefik.http.services.apache.loadbalancer.server.port=80
   mariadb:
     image: mariadb:latest

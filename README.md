@@ -1,6 +1,6 @@
 # Traefik + Slim + Apache + MariaDB as Docker Stack
 
-Three instances of PHP 8.1 as an Apache module in swarm load balanced by Traefik. Single MariaDB instance also in the swarm. This requires you to install Composer dependencies locally in the host machine.
+Three instances of PHP 8.1 as an Apache module in swarm load balanced by Traefik. Single MariaDB instance also in the swarm. Traefik will force https and uses a self generated cert. This requires you to install Composer dependencies locally in the host machine.
 
 If first time testing you need to checkout the repo, change branch and build the `slim-docker-apache` image. If you have already tested the `apache-php` branch the image has already been built for you.
 
@@ -25,41 +25,46 @@ Verify you can access the [dashboard](http://traefik.localhost/dashboard/).
 
 ```
 $ curl --ipv4 --include traefik.localhost
-HTTP/1.1 302 Found
-Content-Type: text/html; charset=utf-8
-Location: /dashboard/
-Date: Sun, 11 Dec 2022 16:49:35 GMT
-Content-Length: 34
+HTTP/1.1 301 Moved Permanently
+Location: https://traefik.localhost/
+Date: Fri, 23 Dec 2022 10:09:14 GMT
+Content-Length: 17
+Content-Type: text/plain; charset=utf-8
+
+Moved Permanently
+
+
+$ curl --ipv4 --include --insecure https://traefik.localhost
+HTTP/2 302
+content-type: text/html; charset=utf-8
+location: /dashboard/
+content-length: 34
+date: Fri, 23 Dec 2022 10:09:37 GMT
 
 <a href="/dashboard/">Found</a>.
-```
 
-You can `tail -f` Apache logs to see the load balancing in action.
-
-```
-$ docker service logs slim_apache -f
 ```
 
 Verify that the [basic route](https://github.com/tuupola/slim-docker/blob/apache-php/app.php#L43-L51) is working.
 
 ```
-$ curl --ipv4 --include apache.localhost
-HTTP/1.1 200 OK
-Content-Length: 12
-Content-Type: text/html; charset=UTF-8
-Date: Sun, 11 Dec 2022 16:53:38 GMT
-Server: Apache/2.4.54 (Debian)
-X-Powered-By: PHP/8.1.13
+$ curl --ipv4 --include --insecure https://apache.localhost
+HTTP/2 200
+content-type: text/html; charset=UTF-8
+date: Fri, 23 Dec 2022 10:09:55 GMT
+server: Apache/2.4.54 (Debian)
+x-powered-by: PHP/8.1.13
+content-length: 12
 
 Hello world!
 
-$ curl --ipv4 --include apache.localhost/mars
-HTTP/1.1 200 OK
-Content-Length: 11
-Content-Type: text/html; charset=UTF-8
-Date: Sun, 11 Dec 2022 16:54:14 GMT
-Server: Apache/2.4.54 (Debian)
-X-Powered-By: PHP/8.1.13
+$ curl --ipv4 --include --insecure https://apache.localhost/mars
+HTTP/2 200
+content-type: text/html; charset=UTF-8
+date: Fri, 23 Dec 2022 10:10:10 GMT
+server: Apache/2.4.54 (Debian)
+x-powered-by: PHP/8.1.13
+content-length: 11
 
 Hello mars!
 ```
@@ -67,13 +72,13 @@ Hello mars!
 Verify you can [query the database](https://github.com/tuupola/slim-docker/blob/apache-php/app.php#L26-L41) successfully.
 
 ```
-$ curl --ipv4 --include apache.localhost/cars
-HTTP/1.1 200 OK
-Content-Length: 15
-Content-Type: text/html; charset=UTF-8
-Date: Sun, 11 Dec 2022 16:55:00 GMT
-Server: Apache/2.4.54 (Debian)
-X-Powered-By: PHP/8.1.13
+$ curl --ipv4 --include --insecure https://apache.localhost/cars
+HTTP/2 200
+content-type: text/html; charset=UTF-8
+date: Fri, 23 Dec 2022 10:10:27 GMT
+server: Apache/2.4.54 (Debian)
+x-powered-by: PHP/8.1.13
+content-length: 15
 
 Tesla Audi BMW
 ```
@@ -81,15 +86,15 @@ Tesla Audi BMW
 Verify that [static files](https://github.com/tuupola/slim-docker/blob/apache-php/public/static.html) are being served.
 
 ```
-$ curl --ipv4 --include apache.localhost/static.html
-HTTP/1.1 200 OK
-Date: Sat, 10 Dec 2022 13:37:50 GMT
-Server: Apache/2.4.54 (Debian)
-Last-Modified: Thu, 08 Dec 2022 09:52:52 GMT
-ETag: "7-5ef4e0022ff77"
-Accept-Ranges: bytes
-Content-Length: 7
-Content-Type: text/htmls
+$ curl --ipv4 --include --insecure https://apache.localhost/static.html
+HTTP/2 200
+accept-ranges: bytes
+content-type: text/html
+date: Fri, 23 Dec 2022 10:10:41 GMT
+etag: "7-5f07aaaa0c423"
+last-modified: Fri, 23 Dec 2022 08:35:22 GMT
+server: Apache/2.4.54 (Debian)
+content-length: 7
 
 static
 ```
@@ -97,14 +102,13 @@ static
 You can also [dump the `$_SERVER`](https://github.com/tuupola/slim-docker/blob/apache-php/app.php#L17-L24) superglobal for debugging purposes.
 
 ```
-$ curl --ipv4 --include "apache.localhost/server?foo=bar"
-HTTP/1.1 200 OK
-Content-Type: text/html; charset=UTF-8
-Date: Sun, 11 Dec 2022 16:55:54 GMT
-Server: Apache/2.4.54 (Debian)
-Vary: Accept-Encoding
-X-Powered-By: PHP/8.1.13
-Transfer-Encoding: chunked
+$ curl --ipv4 --include --insecure "https://apache.localhost/server?foo=bar"
+HTTP/2 200
+content-type: text/html; charset=UTF-8
+date: Fri, 23 Dec 2022 10:11:01 GMT
+server: Apache/2.4.54 (Debian)
+vary: Accept-Encoding
+x-powered-by: PHP/8.1.13
 
 array (
   'REDIRECT_STATUS' => '200',
@@ -113,9 +117,9 @@ array (
   'HTTP_ACCEPT' => '*/*',
   'HTTP_X_FORWARDED_FOR' => '10.0.0.2',
   'HTTP_X_FORWARDED_HOST' => 'apache.localhost',
-  'HTTP_X_FORWARDED_PORT' => '80',
-  'HTTP_X_FORWARDED_PROTO' => 'http',
-  'HTTP_X_FORWARDED_SERVER' => 'a70a47c6effa',
+  'HTTP_X_FORWARDED_PORT' => '443',
+  'HTTP_X_FORWARDED_PROTO' => 'https',
+  'HTTP_X_FORWARDED_SERVER' => '7ef81a767d15',
   'HTTP_X_REAL_IP' => '10.0.0.2',
   'HTTP_ACCEPT_ENCODING' => 'gzip',
   'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
@@ -123,16 +127,16 @@ array (
 ',
   'SERVER_SOFTWARE' => 'Apache/2.4.54 (Debian)',
   'SERVER_NAME' => 'apache.localhost',
-  'SERVER_ADDR' => '10.0.3.8',
+  'SERVER_ADDR' => '10.0.8.4',
   'SERVER_PORT' => '80',
-  'REMOTE_ADDR' => '10.0.3.14',
+  'REMOTE_ADDR' => '10.0.8.10',
   'DOCUMENT_ROOT' => '/srv/www/public',
   'REQUEST_SCHEME' => 'http',
   'CONTEXT_PREFIX' => '',
   'CONTEXT_DOCUMENT_ROOT' => '/srv/www/public',
   'SERVER_ADMIN' => 'webmaster@localhost',
   'SCRIPT_FILENAME' => '/srv/www/public/index.php',
-  'REMOTE_PORT' => '40578',
+  'REMOTE_PORT' => '46148',
   'REDIRECT_URL' => '/server',
   'REDIRECT_QUERY_STRING' => 'foo=bar',
   'GATEWAY_INTERFACE' => 'CGI/1.1',
@@ -142,8 +146,8 @@ array (
   'REQUEST_URI' => '/server?foo=bar',
   'SCRIPT_NAME' => '/index.php',
   'PHP_SELF' => '/index.php',
-  'REQUEST_TIME_FLOAT' => 1670777754.033114,
-  'REQUEST_TIME' => 1670777754,
+  'REQUEST_TIME_FLOAT' => 1671790261.125379,
+  'REQUEST_TIME' => 1671790261,
   'argv' =>
   array (
     0 => 'foo=bar',
