@@ -1,7 +1,0 @@
-localhost {
-	root * /srv/www/public
-	encode zstd gzip
-	php_fastcgi fpm:9000
-	file_server
-	log
-}
